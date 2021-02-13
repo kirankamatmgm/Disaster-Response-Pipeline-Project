@@ -63,16 +63,16 @@ def build_model():
         ('clf', MultiOutputClassifier((AdaBoostClassifier())) )
     ])
     
-#     # hyper-parameter grid
-#     parameters = {
-#     'tfidf__norm':['l2','l1'],
-#     'clf__estimator__learning_rate' :[0.1, 0.5, 1],
-#     'clf__estimator__n_estimators' : [50, 60, 70],
-#     }
-#     #create grid search object
-#     cv = GridSearchCV(pipeline, param_grid=parameters,verbose=5,n_jobs=2)
-#     return cv
-    return pipeline
+    # hyper-parameter grid
+    parameters = {
+    'tfidf__norm':['l2'],
+    'clf__estimator__learning_rate' :[0.1, 0.5],
+    'clf__estimator__n_estimators' : [50, 70],
+    }
+    #create grid search object
+    cv = GridSearchCV(pipeline, param_grid=parameters,cv=2,verbose=5,n_jobs=2)
+    return cv
+#     return pipeline
 
 def evaluate_model(model, X_test, Y_test, category_names):
     """
