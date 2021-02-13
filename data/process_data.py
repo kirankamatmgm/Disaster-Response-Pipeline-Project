@@ -5,7 +5,7 @@ import re
 from sqlalchemy import create_engine 
 
 def load_data(messages_filepath, categories_filepath):
-"""
+    """
     This function loads the message and categories files 
     merge them and return the new dataframe
     input:
@@ -13,7 +13,7 @@ def load_data(messages_filepath, categories_filepath):
         categories_filepath: The path of categories dataset.
     output:
         df: The merged dataset
-"""  
+    """  
     
     messages = pd.read_csv(messages_filepath,index_col='id')
     categories = pd.read_csv(categories_filepath,index_col='id')

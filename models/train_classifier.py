@@ -1,24 +1,108 @@
 import sys
+import pandas as pd
+import numpy as np
+import pickle
+
+from sqlalchemy import create_engine
+
+import nltk
+nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger'])
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.pipeline import Pipeline
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+from sklearn.model_selection import GridSearchCV
 
 
 def load_data(database_filepath):
-    pass
+    """load data from the sqlite database
+    input:
+        database_filepath: File path where sql database was saved.
+    output:
+        X: Training features.
+        Y: Training target.
+        category_names: Categorical name for labeling.
+    """
+    # load data from database
+    engine = create_engine('sqlite:///'+ database_filepath)
+    df = pd.read_sql_table('messages',engine)
+    X = df['message']
+    Y = df.iloc[:,3:]
+    category_names = list(df.columns[3:])
+    return X, Y, category_names
 
 
 def tokenize(text):
-    pass
+    """
+    Tokenize and lemmatize each word in a given text
+    Input: Text data
+    Output: List of clean tokens
+    
+    """
+    tokens=word_tokenize(text)
+    lemmatizer = WordNetLemmatizer()
+    
+    clean_tokens = []
+    for tok in tokens:
+        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
+        clean_tokens.append(clean_tok)
+
+    return clean_tokens
 
 
 def build_model():
-    pass
-
+    # model pipeline
+    pipeline = Pipeline([
+        ('vect', CountVectorizer(tokenizer=tokenize)),
+        ('tfidf', TfidfTransformer()),
+        ('clf', MultiOutputClassifier((AdaBoostClassifier())) )
+    ])
+    
+#     # hyper-parameter grid
+#     parameters = {
+#     'tfidf__norm':['l2','l1'],
+#     'clf__estimator__learning_rate' :[0.1, 0.5, 1],
+#     'clf__estimator__n_estimators' : [50, 60, 70],
+#     }
+#     #create grid search object
+#     cv = GridSearchCV(pipeline, param_grid=parameters,verbose=5,n_jobs=2)
+#     return cv
+    return pipeline
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    pass
+    """
+    Shows model's performance on test data
+    input:
+    model: trained model
+    X_test: Test features
+    Y_test: Test targets
+    category_names: Target labels
+    """
+    y_pred = model.predict(X_test)
+    
+    # print accuracy score
+    print('Accuracy: {}'.format(np.mean(Y_test.values == y_pred)))
+    
+    for i in range(36):
+        print("Precision, Recall, F1 Score for {}".format(Y_test.columns[i]))
+        print(classification_report(Y_test.iloc[:,i], y_pred[:,i],target_names=category_names))
 
 
 def save_model(model, model_filepath):
-    pass
+    """
+    Saves the model to a Python pickle file    
+    input:
+    model: Trained model
+    model_filepath: Filepath to save the model
+    """
+
+    # save model to pickle file
+    pickle.dump(model, open(model_filepath, 'wb'))
 
 
 def main():
