@@ -1,16 +1,64 @@
 import sys
-
+import pandas as pd
+import numpy as np
+import re
+from sqlalchemy import create_engine 
 
 def load_data(messages_filepath, categories_filepath):
-    pass
+"""
+    This function loads the message and categories files 
+    merge them and return the new dataframe
+    input:
+        messages_filepath: The path of messages dataset.
+        categories_filepath: The path of categories dataset.
+    output:
+        df: The merged dataset
+"""  
+    
+    messages = pd.read_csv(messages_filepath,index_col='id')
+    categories = pd.read_csv(categories_filepath,index_col='id')
+    df = messages.merge(categories,on='id')
+    return df
 
 
 def clean_data(df):
-    pass
-
+    """Clean the merged dataframe to make it ready to analyze
+    Input: DataFrame
+    Output: cleaned dataframe
+    """
+    # create a dataframe of the 36 individual category columns
+    categories = pd.Series(df['categories']).str.split(pat=';',expand=True)
+    # select the first row of the categories dataframe
+    row = categories.iloc[0]
+    # use this row to extract a list of new column names for categories.
+    category_colnames = row.apply(lambda x:re.sub(r'-[0-9]', '', x))
+    # rename the columns of `categories`
+    categories.columns = category_colnames
+    for column in categories:
+        # set each value to be the last character of the string
+        categories[column] =  pd.Series(categories[column]).str.split('-').str[1]
+    
+        # convert column from string to numeric
+        categories[column] = categories[column].astype(int)
+    # drop the original categories column from `df`
+    df.drop(columns=['categories'], inplace=True)
+    # concatenate the original dataframe with the new `categories` dataframe
+    df = pd.concat([df, categories], axis=1)
+    # drop duplicates
+    df.drop_duplicates(inplace=True)
+    
+    return df
 
 def save_data(df, database_filename):
-    pass  
+    """
+    Save the cleaned dataframe into the given database 
+    input: 
+        df: dataframe
+        database_filename: database to store the cleaned dataframe 
+    
+    """
+    engine = create_engine('sqlite:///{}'.format(database_filename))
+    df.to_sql('messages', engine, index=False,if_exists='replace')  
 
 
 def main():
