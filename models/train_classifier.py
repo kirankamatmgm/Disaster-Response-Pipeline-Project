@@ -17,6 +17,8 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.model_selection import GridSearchCV
+from sklearn.neighbors import KNeighborsClassifier
+
 
 
 def load_data(database_filepath):
@@ -60,7 +62,7 @@ def build_model():
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
-        ('clf', MultiOutputClassifier((AdaBoostClassifier())) )
+        ('clf', MultiOutputClassifier((AdaBoostClassifier())))
     ])
     
     # hyper-parameter grid
