@@ -1,11 +1,13 @@
 # Disaster Response Pipeline Project
-https://view6914b2f4-3001.udacity-student-workspaces.com/
-
-
 
 ## Project Motivation
+In this project, I apply my skills in Data Engineering to analyze disaster data from Figure Eight to build a model that classifies disaster messages.
 
-In this project, I apply skills I learned in Data Engineering Section to analyze disaster data from Figure Eight to build a model for an API that classifies disaster messages.
+
+## Summary
+In this project, I analyze disaster data from Figure Eight to build a model that classifies disaster messages. Data set provided by Figure Eight contains real messages that were sent during disaster events. I will be creating a machine learning pipeline to categorize these events so that I can classify these messages into different category. In this project I have built a web app where I can input a new message and get classification results in several categories. The web app will also display visualizations of the data. 
+
+
 
 ### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
@@ -39,5 +41,6 @@ In this project, I apply skills I learned in Data Engineering Section to analyze
     │   ├── train_classifier.py              # Train ML model
     │   └── classifier.pkl                   # pikkle file of model   
     |   
+    |── requirements.txt                     # contains versions of all libraries used.
+    |
     └── README.md
-

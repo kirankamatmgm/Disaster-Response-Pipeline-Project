@@ -49,7 +49,7 @@ def index():
         category_counts.append(np.sum(df[column_name]))
         
     df['text length'] = df['message'].apply(lambda x: len(x.split()))
-    histogram = df[df['text length'] < 100].groupby('text length').count()['message']
+    msg_length = df[df['text length'] < 100].groupby('text length').count()['message']
     # create visuals
     graphs = [
         {
@@ -91,8 +91,8 @@ def index():
         {
             'data': [
                 Bar(
-                    x=histogram.index,
-                    y=histogram.values
+                    x=msg_length.index,
+                    y=msg_length.values
                 )
             ],
 
