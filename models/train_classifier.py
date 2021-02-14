@@ -2,6 +2,10 @@ import sys
 import pandas as pd
 import numpy as np
 import pickle
+import re
+import warnings
+
+warnings.filterwarnings('ignore')
 
 from sqlalchemy import create_engine
 
@@ -20,7 +24,6 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import KNeighborsClassifier
 
 
-
 def load_data(database_filepath):
     """load data from the sqlite database
     input:
@@ -33,9 +36,9 @@ def load_data(database_filepath):
     # load data from database
     engine = create_engine('sqlite:///'+ database_filepath)
     df = pd.read_sql_table('messages',engine)
-    X = df['message']
-    Y = df.iloc[:,3:]
-    category_names = list(df.columns[3:])
+    X = df.message
+    Y = df.iloc[:,4:]
+    category_names = list(df.columns[4:])
     return X, Y, category_names
 
 
@@ -72,7 +75,7 @@ def build_model():
     'clf__estimator__n_estimators' : [50, 70],
     }
     #create grid search object
-    cv = GridSearchCV(pipeline, param_grid=parameters,cv=2,verbose=5,n_jobs=2)
+    cv = GridSearchCV(pipeline, param_grid=parameters,cv=2,verbose=5)
     return cv
 #     return pipeline
 
@@ -87,12 +90,13 @@ def evaluate_model(model, X_test, Y_test, category_names):
     """
     y_pred = model.predict(X_test)
     
+    print(classification_report(Y_test, y_pred, target_names = category_names))
     # print accuracy score
-    print('Accuracy: {}'.format(np.mean(Y_test.values == y_pred)))
+#     print('Accuracy: {}'.format(np.mean(Y_test.values == y_pred)))
     
-    for i in range(36):
-        print("Precision, Recall, F1 Score for {}".format(Y_test.columns[i]))
-        print(classification_report(Y_test.iloc[:,i], y_pred[:,i],target_names=category_names))
+#     for i in range(36):
+#         print("Precision, Recall, F1 Score for {}".format(Y_test.columns[i]))
+#         print(classification_report(Y_test.iloc[:,i], y_pred[:,i],target_names=category_names))
 
 
 def save_model(model, model_filepath):

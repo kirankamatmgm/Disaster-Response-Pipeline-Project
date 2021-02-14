@@ -43,7 +43,7 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
     
-    category = list(df.columns[3:])
+    category = list(df.columns[4:])
     category_counts = []
     for column_name in category:
         category_counts.append(np.sum(df[column_name]))
@@ -124,7 +124,7 @@ def go():
 
     # use model to predict classification for query
     classification_labels = model.predict([query])[0]
-    classification_results = dict(zip(df.columns[3:], classification_labels))
+    classification_results = dict(zip(df.columns[4:], classification_labels))
 
     # This will render the go.html Please see that file. 
     return render_template(
